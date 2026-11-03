@@ -83,33 +83,29 @@ jobs:
     needs: build
     permissions:
       contents: write # Needed for softprops/action-gh-release.
+      id-token: write # Needed for npm trusted publishing.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+      # Each artifact holds prebuilds/<platform>-<arch>/, merged into the
+      # layout node-gyp-build looks for.
       - uses: actions/download-artifact@v8
         with:
           path: prebuilds
+          merge-multiple: true
       - run: echo "version=$(git describe --tags)" >> $GITHUB_OUTPUT
         id: get_version
-      - run:
-          tar -cvf "${{ steps.get_version.outputs.version }}-darwin-x64.tar" -C
-          "prebuilds/macos-15-intel-x64" darwin-x64
-      - run:
-          tar -cvf "${{ steps.get_version.outputs.version }}-darwin-arm64.tar"
-          -C "prebuilds/macos-latest-arm64" darwin-arm64
-      - run:
-          tar -cvf "${{ steps.get_version.outputs.version }}-linux-x64.tar" -C
-          "prebuilds/ubuntu-22.04-x64" linux-x64
-      - run:
-          tar -cvf "${{ steps.get_version.outputs.version }}-linux-arm64.tar"
-          -C "prebuilds/ubuntu-24.04-arm-arm64" linux-arm64
-      - run:
-          tar -cvf "${{ steps.get_version.outputs.version }}-win32-ia32.tar" -C
-          "prebuilds/windows-latest-x86" win32-ia32
-      - run:
-          tar -cvf "${{ steps.get_version.outputs.version }}-win32-x64.tar" -C
-          "prebuilds/windows-latest-x64" win32-x64
+      - run: |
+          for p in $(ls prebuilds); do
+            tar -cvf "${{ steps.get_version.outputs.version }}-$p.tar" -C prebuilds "$p"
+          done
       - uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.get_version.outputs.version }}-*.tar
           token: ${{ secrets.GITHUB_TOKEN }}
+      # A prerelease version (4.1.0-ac.N) needs an explicit tag.
+      - run: npm publish --access public --tag latest

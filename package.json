@@ -1,6 +1,6 @@
 {
-  "name": "bufferutil",
-  "version": "4.1.0",
+  "name": "@audc/bufferutil",
+  "version": "4.1.0-ac.1",
   "description": "WebSocket buffer utils",
   "main": "index.js",
   "engines": {
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/websockets/bufferutil.git"
+    "url": "git+https://github.com/audiocodes-dev/bufferutil.git"
   },
   "keywords": [
     "bufferutil"
