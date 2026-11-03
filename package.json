@@ -1,6 +1,6 @@
 {
   "name": "@audc/bufferutil",
-  "version": "4.1.0-ac.1",
+  "version": "4.1.0-ac.2",
   "description": "WebSocket buffer utils",
   "main": "index.js",
   "engines": {
